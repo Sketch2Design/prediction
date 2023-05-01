@@ -45,12 +45,12 @@ def post_process(image, prediction):
 	threshold = 0.85
 
 	if len(prediction[0]['boxes']) != 0:
-		boxes = prediction[0]['boxes'].data.numpy()
-		scores = prediction[0]['scores'].data.numpy()
+		boxes = prediction[0]['boxes'].data
+		scores = prediction[0]['scores'].data
 		# filter out boxes according to `detection_threshold`
-		boxes = boxes[scores >= threshold].astype(np.int32)
+		boxes = boxes[scores >= threshold].tolist()
 		# get all the predicited class names
-		pred_classes = [classes[i] for i in prediction[0]['labels'].cpu().numpy()]
+		pred_classes = [classes[i] for i in prediction[0]['labels']]
 
 			
 	return boxes,pred_classes

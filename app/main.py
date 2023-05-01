@@ -31,7 +31,9 @@ async def create_upload_files(files: UploadFile = File()):
 
     # # Post process and stitch together the two images to return them
     boxes, pred_classes = post_process(orig_image, prediction)
-    return {"data": {"boxes": boxes, "classes": pred_classes}}
+    result = dict({"data": {"boxes": boxes, "classes": pred_classes}})
+    print(result)
+    return result
 
 
 @app.get("/")

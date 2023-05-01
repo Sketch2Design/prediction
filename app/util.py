@@ -6,9 +6,7 @@ import numpy as np
 
 def load_model():
 	path = os.path.join('model','model.pth')
-	
 	modal = torch.load(path, map_location=torch.device('cpu'))
-	modal.to('cpu')
 	modal.eval()
 
 	return modal  
@@ -22,9 +20,8 @@ def pre_process(image_file):
 						cv2.IMREAD_COLOR)
 	# reseze 
 	image = cv2.resize(image, (512, 512))
-	orig_image = image.copy()
 	# BGR to RGB
-	image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB).astype(np.float32)
+	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
 	# make the pixel range between 0 and 1
 	image /= 255.0
 	# bring color channels to front
@@ -34,7 +31,7 @@ def pre_process(image_file):
 	# add batch dimension
 	image = torch.unsqueeze(image, 0)
 		
-	return image, orig_image
+	return image
 
 
 
@@ -42,7 +39,7 @@ def post_process(image, prediction):
 	classes = (
     	"background", "rectangle", "frame_rectangle", "ellipse", "frame_ellipse"
 	)
-	threshold = 0.85
+	threshold = 0.7
 
 	if len(prediction[0]['boxes']) != 0:
 		boxes = prediction[0]['boxes'].data
@@ -51,6 +48,5 @@ def post_process(image, prediction):
 		boxes = boxes[scores >= threshold].tolist()
 		# get all the predicited class names
 		pred_classes = [classes[i] for i in prediction[0]['labels']]
-
 			
-	return boxes,pred_classes
+	return boxes, pred_classes

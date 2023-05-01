@@ -12,17 +12,16 @@ model = load_model()
 app = FastAPI()
 
 @app.post("/upload")
-async def create_upload_files(files: UploadFile = File()):
-    """ Create API endpoint to send image to and specify
-     what type of file it'll take
+async def create_upload_files(file: UploadFile = File()):
+    """ Create API endpoint to send image and get predicition
 
-    :param files: Get image files, defaults to File(...)
-    :type files: List[UploadFile], optional
-    :return: A list of png images
-    :rtype: list(bytes)
+    :param files: Get image file
+    :type files: List: UploadFile
+    :return: bounding box and labels
+    :rtype: list()
     """
     # Return preprocessed input batch and loaded image
-    image, orig_image = pre_process(files)
+    image = pre_process(files)
 
     # Run the model and postpocess the output
     with torch.inference_mode():
@@ -30,9 +29,10 @@ async def create_upload_files(files: UploadFile = File()):
     prediction = [{k: v.to('cpu') for k, v in t.items()} for t in prediction]
 
     # # Post process and stitch together the two images to return them
-    boxes, pred_classes = post_process(orig_image, prediction)
+    boxes, pred_classes = post_process(prediction)
+    
     result = dict({"data": {"boxes": boxes, "classes": pred_classes}})
-    print(result)
+
     return result
 
 
